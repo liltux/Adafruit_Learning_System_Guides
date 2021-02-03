@@ -8,7 +8,7 @@ import board
 import audiobusio
 import displayio
 import ulab
-import ulab.extras
+import ulab.fft
 import ulab.vector
 
 display = board.DISPLAY
@@ -76,13 +76,13 @@ def main():
     while True:
         mic.record(samples_bit, len(samples_bit))
         samples = ulab.array(samples_bit[3:])
-        spectrogram1 = ulab.extras.spectrogram(samples)
+        spectrogram1 = ulab.fft.spectrogram(samples)
         # spectrum() is always nonnegative, but add a tiny value
         # to change any zeros to nonzero numbers
         spectrogram1 = ulab.vector.log(spectrogram1 + 1e-7)
         spectrogram1 = spectrogram1[1:(fft_size//2)-1]
-        min_curr = ulab.numerical.min(spectrogram1)[0]
-        max_curr = ulab.numerical.max(spectrogram1)[0]
+        min_curr = ulab.numerical.min(spectrogram1)
+        max_curr = ulab.numerical.max(spectrogram1)
 
         if max_curr > max_all:
             max_all = max_curr

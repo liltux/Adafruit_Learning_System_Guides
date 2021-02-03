@@ -17,6 +17,8 @@ All text above must be included in any redistribution.
 import time
 import board
 import audioio
+import audiocore
+import audiomixer
 import adafruit_trellism4
 from color_names import *
 
@@ -47,7 +49,7 @@ channel_count = None
 bits_per_sample = None
 sample_rate = None
 with open(SAMPLE_FOLDER+SAMPLES[0][0], 'rb') as f:
-    wav = audioio.WaveFile(f)
+    wav = audiocore.WaveFile(f)
     channel_count = wav.channel_count
     bits_per_sample = wav.bits_per_sample
     sample_rate = wav.sample_rate
@@ -63,7 +65,7 @@ with open(SAMPLE_FOLDER+SAMPLES[0][0], 'rb') as f:
     else:
         raise RuntimeError('Must be mono or stereo waves!')
 
-mixer = audioio.Mixer(voice_count=2,
+mixer = audiomixer.Mixer(voice_count=2,
                       sample_rate=sample_rate,
                       channel_count=channel_count,
                       bits_per_sample=bits_per_sample,
@@ -78,7 +80,7 @@ for i, v in enumerate(SAMPLES):
     filename = SAMPLE_FOLDER+v[0]
     try:
         with open(filename, 'rb') as f:
-            wav = audioio.WaveFile(f)
+            wav = audiocore.WaveFile(f)
             print(filename,
                   '%d channels, %d bits per sample, %d Hz sample rate ' %
                   (wav.channel_count, wav.bits_per_sample, wav.sample_rate))
@@ -115,7 +117,7 @@ while True:
         try:
             filename = SAMPLE_FOLDER+SAMPLES[sample_num][0]
             f = open(filename, 'rb')
-            wav = audioio.WaveFile(f)
+            wav = audiocore.WaveFile(f)
 
             if down[1] == 0:              # background loop?
                 if current_background['voice'] != None:

@@ -17,6 +17,8 @@ All text above must be included in any redistribution.
 import time
 import board
 import audioio
+import audiocore
+import audiomixer
 
 SAMPLE_FOLDER = '/samples/'       # the name of the folder containing the samples
 VOICE_COUNT = 8
@@ -44,7 +46,7 @@ class Synth(object):
     def _initialize_audio(self):
         if self._audio is None:
             self._audio = audioio.AudioOut(board.A1)
-            self._mixer = audioio.Mixer(voice_count=VOICE_COUNT,
+            self._mixer = audiomixer.Mixer(voice_count=VOICE_COUNT,
                                         sample_rate=16000,
                                         channel_count=1,
                                         bits_per_sample=16,
@@ -76,7 +78,7 @@ class Synth(object):
                     if first_note is None:
                         first_note = filename.strip()
         sound_file = open(SAMPLE_FOLDER+first_note, 'rb')
-        wav = audioio.WaveFile(sound_file)
+        wav = audiocore.WaveFile(sound_file)
         self._mixer.play(wav, voice=0, loop=False)
         time.sleep(0.5)
         self._mixer.stop_voice(0)
@@ -105,7 +107,7 @@ class Synth(object):
         fname = self._samples[key]
         if fname is not None:
             f = open(SAMPLE_FOLDER+fname, 'rb')
-            wav = audioio.WaveFile(f)
+            wav = audiocore.WaveFile(f)
             voice = self._find_usable_voice_for(key)
             if voice is not None:
                 voice['key'] = key

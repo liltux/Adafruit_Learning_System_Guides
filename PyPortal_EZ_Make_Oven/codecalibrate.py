@@ -2,12 +2,18 @@ import time
 import board
 import busio
 import digitalio
+import sys
 from adafruit_mcp9600 import MCP9600
 
 SENSOR_ADDR = 0X67
 
 i2c = busio.I2C(board.SCL, board.SDA,frequency=200000)
-sensor = MCP9600(i2c,SENSOR_ADDR,"K")
+try:
+    sensor = MCP9600(i2c,SENSOR_ADDR,"K")
+except ValueError as e:
+    print(e)
+    print("Unable to connect to the thermocouple sensor.")
+    sys.exit(1)
 
 oven = digitalio.DigitalInOut(board.D4)
 oven.direction = digitalio.Direction.OUTPUT
@@ -19,10 +25,11 @@ def oven_control(enable=False):
 check_temp = 100
 print("This program will determine calibration settings ")
 print("for your oven to use with the EZ Make Oven.\n\n")
-print("Calibration will start in 10 seconds...")
-time.sleep(10)
+for i in range(10):
+    print("Calibration will start in %d seconds..." % (10-i))
+    time.sleep(1)
 print("Starting...")
-print("Calibrating oven temperature to ",check_temp)
+print("Calibrating oven temperature to %d C" % check_temp)
 finish = False
 oven_control(True)
 maxloop=300
@@ -31,7 +38,7 @@ while not finish:
     time.sleep(1)
     counter += 1
     current_temp = sensor.temperature
-    print(current_temp)
+    print("%.02f C" % current_temp)
     if current_temp >= check_temp:
         finish = True
         oven_control(False)

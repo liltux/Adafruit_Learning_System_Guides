@@ -4,7 +4,7 @@ import array
 import math
 import board
 import busio
-import audioio
+import audiocore
 import displayio
 import digitalio
 from adafruit_pyportal import PyPortal
@@ -16,7 +16,7 @@ import adafruit_touchscreen
 from adafruit_mcp9600 import MCP9600
 
 TITLE = "EZ Make Oven Controller"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 print(TITLE, "version ", VERSION)
 time.sleep(2)
@@ -83,13 +83,13 @@ class Beep(object):
         for i in range(length):
             sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / length))
                                * tone_volume * (2 ** 15 - 1))
-        self.sine_wave_sample = audioio.RawSample(sine_wave)
+        self.sine_wave_sample = audiocore.RawSample(sine_wave)
 
     # pylint: disable=protected-access
     def play(self, duration=0.1):
-        if not pyportal._speaker_enable.value:
-            pyportal._speaker_enable.value = True
-            pyportal.audio.play(self.sine_wave_sample, loop=True)
+        if not pyportal.peripherals._speaker_enable.value:
+            pyportal.peripherals._speaker_enable.value = True
+            pyportal.peripherals.audio.play(self.sine_wave_sample, loop=True)
             self.start = time.monotonic()
             self.duration = duration
             if duration <= .5:
@@ -99,10 +99,10 @@ class Beep(object):
                 self.stop()
 
     def stop(self):
-        if pyportal._speaker_enable.value:
+        if pyportal.peripherals._speaker_enable.value:
             self.duration = 0
-            pyportal.audio.stop()
-            pyportal._speaker_enable.value = False
+            pyportal.peripherals.audio.stop()
+            pyportal.peripherals._speaker_enable.value = False
 
     def refresh(self):
         if time.monotonic() - self.start >= self.duration:
